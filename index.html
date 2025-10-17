@@ -199,6 +199,7 @@
 <div class="carousel" id="carousel">
   <div class="tile" data-color="rgb(248, 247, 255,1)" style="background-image:url('imagenes/LAM\ 1-01.jpg');"></div>
   <div class="tile" data-color="rgb(238, 238, 238,1)" style="background-image:url('imagenes/lam\ 2-01.jpg');"></div>
+ <div class="tile" data-color="rgb(248, 247, 255,1)" style="background-image:url('imagenes/LAM3-01');"></div>
   <div class="tile" data-color="rgb(248, 247, 255,1)" style="background-image:url('imagenes/lam\ 4.jpg');"></div>
   <div class="tile" data-color="rgb(238, 238, 238,1)" style="background-image:url('imagenes/lam\ 5\ port-01.jpg');"></div>
   <div class="tile" data-color="rgb(248, 247, 255,1)" style="background-image:url('imagenes/LAM\ 6-01.jpg');"></div>
@@ -224,7 +225,7 @@ let startOffset = 0;
 let dragMoved = false;
 
 const CLONE_TARGET_W = 640;
-const CLONE_TARGET_H = 400;
+const CLONE_TARGET_H = 500;
 const clones = [];
 
 tiles.forEach((tile, i) => {
@@ -393,7 +394,7 @@ function hideExpandedClones() {
 
   const namediv = document.getElementsByClassName("name")[0];
   const descripdiv = document.getElementsByClassName("description")[0];
-  const redesdiv= document.getElementsByClassName("instagram")[0];
+  const redesdiv= document.getElementsByClassName("instagram")[1];
   namediv.style.color = "#fff";
   descripdiv.style.color = "#fff";
   redesdiv.style.color = "#fff";
@@ -482,3 +483,4 @@ window.addEventListener('resize', recalc);
 
 </body>
 </html>
+
