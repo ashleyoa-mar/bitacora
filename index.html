@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ashley Portfolio Carousel</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  @font-face {
+  font-family: 'Blockat';
+  src: url('fonts/blockat.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+  @font-face {
+  font-family: 'Arista';
+  src: url('fonts/arista.ttf');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
+ body {
+    background: #111;
+    overflow: hidden;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family:'Arista';
+    color: #fff;
+  }
+  .name {
+    position: fixed;
+    top: 25px;
+    left: 30px;
+    font-size: 2rem;
+    letter-spacing: 1px;
+    font-weight: 500;
+    color: #fff;
+    z-index: 2000;
+  }
+  .description {
+    position: fixed;
+    bottom: 25px;
+    left: 30px;
+    font-size: 1rem;
+    color: #bbb;
+    z-index: 2000;
+  }
+  .instagram {
+    position: fixed;
+    bottom: 25px;
+    right: 30px;
+    font-size: 1rem;
+    text-decoration: none;
+    z-index: 2000;
+  }
+
+
+  .instagram a {
+    color: #fff;
+    text-decoration: none;
+    border-bottom: 1px solid #fff0;
+    transition: border-color 0.3s ease;
+  }
+
+  .carousel {
+    position: relative;
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease;
+    will-change: transform;
+  }
+
+  .tile {
+    width: 70px;
+    height: 220px;
+    margin: 0 10px;
+    border-radius: 0px;
+    background-size: cover;
+    background-position: center;
+    transition: all 0.6s ease;
+    filter: grayscale(100%);
+    flex-shrink: 0;
+    cursor: initial;
+    user-select: none;
+    position: relative;
+    top: 100px;
+    transform: translateY(-50%);
+    opacity: 0.4;
+  }
+
+  .tile:hover { filter: grayscale(0%); opacity: 1;cursor:initial; }
+  .tile.focused { filter: grayscale(0%); z-index: 2; }
+
+  /* overlay that hides the line of tiles while clone expands */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0);
+    pointer-events: none;
+    transition: background 400ms ease;
+    z-index: 1000;
+  }
+
+  .overlay.active {
+    pointer-events: auto;
+  }
+
+
+  /* clone element that animates from tile position to center/expanded size */
+  .clone {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 1px;
+    height: 1px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 0px;
+    box-shadow: 0 5px 5px rgba(0, 0, 0, 0.6);
+    z-index: 1100;
+    filter: grayscale(100%) brightness(0.8);
+    transition:
+      left 420ms cubic-bezier(.22,.9,.34,1),
+      top 420ms cubic-bezier(.22,.9,.34,1),
+      width 420ms cubic-bezier(.22,.9,.34,1),
+      height 420ms cubic-bezier(.22,.9,.34,1),
+      border-radius 220ms ease;
+    will-change: left, top, width, height;
+    overflow: hidden;
+  }
+
+
+  .clone.focused {
+    filter: grayscale(0%) brightness(1);
+  }
+
+
+  /* hidden by default (we create clones but keep them removed/hidden until used) */
+  .clone.hidden { display: none; }
+
+  .hidden-group {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 1200;
+  text-align: center;
+  font-size: 2rem;
+  color: #0A0903;
+  display: flex;
+  gap: 0.3em;
+  font-family: 'Blockat';
+}
+
+.hidden-group .top {
+  position: absolute;
+  top: calc(50% - 260px);
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.hidden-group .bottom {
+  position: absolute;
+  top: calc(50% + 220px);
+  display: flex;
+  width: 100%;
+  justify-content: center;
+}
+
+.hidden-group.visible {
+  opacity: 1;
+}
+
+
+
+  /* small responsive */
+  @media (max-width:600px) {
+    .tile { width: 56px; height: 180px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="name">ashley.</div>
+<div class="description">Estudiante de arquitectura, PUCP</div>
+<div class="instagram"><a class="instagram" href="https://www.instagram.com/ashleyoa_?utm_source=ig_web_button_share_sheet&igsh=MWVoZ3pyZGZqOWU4eQ==" target="_blank">Instagram</a></div>
+
+
+
+<!-- main carousel (your existing DOM) -->
+<div class="carousel" id="carousel">
+  <div class="tile" data-color="rgb(248, 247, 255,1)" style="background-image:url('imagenes/LAM\ 1-01.jpg');"></div>
+  <div class="tile" data-color="rgb(238, 238, 238,1)" style="background-image:url('imagenes/lam\ 2-01.jpg');"></div>
+  <div class="tile" data-color="rgb(248, 247, 255,1)" style="background-image:url('imagenes/lam\ 4.jpg');"></div>
+  <div class="tile" data-color="rgb(238, 238, 238,1)" style="background-image:url('imagenes/lam\ 5\ port-01.jpg');"></div>
+  <div class="tile" data-color="rgb(248, 247, 255,1)" style="background-image:url('imagenes/LAM\ 6-01.jpg');"></div>
+</div>
+
+<!-- overlay used to hide the line while clone expands -->
+<div id="overlay" class="overlay" aria-hidden="true"></div>
+<script>
+const carousel = document.getElementById('carousel');
+const tiles = [...carousel.querySelectorAll('.tile')];
+const overlay = document.getElementById('overlay');
+
+let gap = 20;
+let baseOffset = window.innerWidth / 2 - 1000 / 2;
+let offset = baseOffset;
+let expanded = false;
+let focusedIndex = null;
+
+// dragging state
+let isDragging = false;
+let startX = 0;
+let startOffset = 0;
+let dragMoved = false;
+
+const CLONE_TARGET_W = 640;
+const CLONE_TARGET_H = 400;
+const clones = [];
+
+tiles.forEach((tile, i) => {
+  const c = document.createElement('div');
+  c.className = 'clone hidden';
+  c.style.backgroundImage = getComputedStyle(tile).backgroundImage;
+  document.body.appendChild(c);
+  clones[i] = c;
+});
+
+function clampOffset(v) {
+  const min = baseOffset - (tiles.length - 1) * (70 + gap);
+  const max = baseOffset;
+  return Math.max(min, Math.min(max, v));
+}
+function applyTransform() {
+  carousel.style.transform = `translateX(${offset}px)`;
+}
+function recalc() {
+  baseOffset = window.innerWidth / 2 - 150 / 2;
+  offset = clampOffset(offset);
+  applyTransform();
+}
+applyTransform();
+
+// --- dragging logic ---
+carousel.addEventListener('pointerdown', (e) => {
+  if (overlay.classList.contains('active')) return;
+  isDragging = true;
+  dragMoved = false;
+  startX = e.clientX;
+  startOffset = offset;
+  carousel.style.transition = 'none';
+});
+window.addEventListener('pointermove', (e) => {
+  if (!isDragging) return;
+  const dx = e.clientX - startX;
+  if (Math.abs(dx) > 5) dragMoved = true;
+  offset = clampOffset(startOffset + dx);
+  applyTransform();
+});
+window.addEventListener('pointerup', (e) => {
+  if (!isDragging) return;
+  isDragging = false;
+  carousel.style.transition = 'transform 0.3s ease';
+});
+
+//Logic to add a different background color
+
+
+// --- main show/hide behavior ---
+function showCloneAtIndex(i) {
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const spacing = 100;
+  const expandedWidth = CLONE_TARGET_W;
+  const expandedHeight = CLONE_TARGET_H;
+  const namediv = document.getElementsByClassName("name")[0];
+  const descripdiv = document.getElementsByClassName("description")[0];
+  const redesdiv= document.getElementsByClassName("instagram")[1];
+  if (redesdiv) {
+    redesdiv.style.color = '#0A0903';
+  }
+  namediv.style.color = "#0A0903";
+  descripdiv.style.color = "#0A0903";
+
+
+  focusedIndex = i;
+  expanded = true;
+
+
+  // 1️⃣ Immediately hide the carousel and force reflow
+  carousel.style.transition = 'none';
+  carousel.style.opacity = '0';
+  carousel.style.visibility = 'hidden';
+  // Force style flush so it's applied *before* clones render
+  void carousel.offsetHeight;
+
+  // 2️⃣ Now safely show overlay
+  const color = tiles[i].dataset.color || "rgba(0,0,0,0.2)";
+  overlay.style.background = color;
+  overlay.classList.add('active');
+  overlay.setAttribute('aria-hidden', 'false');
+
+  // 3️⃣ Prepare clones
+  clones.forEach(c => c.classList.add('hidden'));
+
+  const targetCenterX = vw / 2;
+  const targetCenterY = vh / 2;
+  const startLeft = targetCenterX - expandedWidth / 2;
+  const startTop = targetCenterY - expandedHeight / 2;
+
+  // 4️⃣ Position clones exactly over hidden tiles
+  tiles.forEach((tile, idx) => {
+    const clone = clones[idx];
+    const rect = tile.getBoundingClientRect();
+    clone.style.backgroundImage = getComputedStyle(tile).backgroundImage;
+    clone.classList.remove('hidden');
+    clone.style.transition = 'none';
+    clone.style.left = `${rect.left}px`;
+    clone.style.top = `${rect.top}px`;
+    clone.style.width = `${rect.width}px`;
+    clone.style.height = `${rect.height}px`;
+  });
+
+  // 5️⃣ Force reflow before animating to expanded positions
+  void clones[0].offsetWidth;
+
+  clones.forEach((clone, idx) => {
+    const relativeIndex = idx - i;
+    const targetLeft = startLeft + relativeIndex * (expandedWidth + spacing);
+    const targetTop = startTop;
+    clone.style.transition = 'left 500ms cubic-bezier(.22,.9,.34,1), top 500ms cubic-bezier(.22,.9,.34,1), width 500ms cubic-bezier(.22,.9,.34,1), height 500ms cubic-bezier(.22,.9,.34,1)';
+    clone.style.left = `${targetLeft}px`;
+    clone.style.top = `${targetTop}px`;
+    clone.style.width = `${expandedWidth}px`;
+    clone.style.height = `${expandedHeight}px`;
+    if (idx==i) clone.style.filter = "grayscale(0%) brightness(0.8)";
+  });
+
+  // 6️⃣ Set up click navigation
+  clones.forEach((clone, idx) => {
+    clone.onclick = (e) => {
+      e.stopPropagation();
+      if (idx === focusedIndex) return;
+      focusClone(idx);
+    };
+  });
+}
+
+
+function focusClone(newIndex) {
+  focusedIndex = newIndex;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const expandedWidth = CLONE_TARGET_W;
+  const expandedHeight = CLONE_TARGET_H;
+  const spacing = 30;
+  const targetCenterX = vw / 2;
+  const targetCenterY = vh / 2;
+  const startLeft = targetCenterX - expandedWidth / 2;
+  const startTop = targetCenterY - expandedHeight / 2;
+
+  // 🟢 NEW: update overlay color based on the newly focused tile
+  const color = tiles[newIndex].dataset.color || "rgba(0,0,0,0.2)";
+  overlay.style.transition = "background 300ms ease";
+  overlay.style.background = color;
+
+  clones.forEach((clone, idx) => {
+    const relativeIndex = idx - newIndex;
+    const targetLeft = startLeft + relativeIndex * (expandedWidth + spacing);
+    const targetTop = startTop;
+    clone.style.transition = 'left 500ms cubic-bezier(.22,.9,.34,1), top 500ms cubic-bezier(.22,.9,.34,1)';
+    clone.style.left = `${targetLeft}px`;
+    clone.style.top = `${targetTop}px`;
+    if (idx===focusedIndex) 
+      clone.style.filter = "grayscale(0%) brightness(1)";
+    else
+      clone.style.filter = "grayscale(100%) brightness(0.8)"
+  });
+}
+
+function hideExpandedClones() {
+  if (!expanded) return;
+  expanded = false;
+
+  const namediv = document.getElementsByClassName("name")[0];
+  const descripdiv = document.getElementsByClassName("description")[0];
+  const redesdiv= document.getElementsByClassName("instagram")[0];
+  namediv.style.color = "#fff";
+  descripdiv.style.color = "#fff";
+  redesdiv.style.color = "#fff";
+
+
+  overlay.style.background = "rgba(0,0,0,0)";
+  overlay.classList.remove('active');
+  overlay.setAttribute('aria-hidden', 'true');
+  overlay.classList.remove('active');
+  overlay.setAttribute('aria-hidden', 'true');
+
+  // Step 1: Make the carousel transparent but keep it hidden
+  carousel.style.transition = "none";
+  carousel.style.opacity = "0";
+  carousel.style.visibility = "hidden";
+
+  // Step 2: Animate clones shrinking and fading out smoothly
+  tiles.forEach((tile, idx) => {
+    const clone = clones[idx];
+    const rect = tile.getBoundingClientRect();
+    clone.style.transition = `
+      left 450ms ease,
+      top 450ms ease,
+      width 450ms ease,
+      height 400ms ease,
+      filter 450ms ease,
+      opacity 450ms ease
+    `;
+    clone.style.left = `${rect.left}px`;
+    clone.style.top = `${rect.top}px`;
+    clone.style.width = `${rect.width}px`;
+    clone.style.height = `${rect.height}px`;
+    clone.style.filter = "grayscale(100%) brightness(0.9)";
+    clone.style.opacity = "0"; // fade out clone
+  });
+
+  // Step 3: After clones shrink and fade out
+  setTimeout(() => {
+    clones.forEach(c => {
+      c.classList.add('hidden');
+      c.style.filter = "";
+      c.style.opacity = "1"; // reset
+    });
+
+    // Step 4: Now fade the carousel back in *after* clones are gone
+    carousel.style.visibility = "visible";
+    carousel.style.transition = "opacity 370ms ease";
+    requestAnimationFrame(() => {
+      carousel.style.opacity = "1";
+    });
+  }, 600); // slightly longer than clone animation
+}
+
+
+// --- tile click handler ---
+tiles.forEach((tile, i) => {
+  tile.addEventListener('click', (e) => {
+    if (dragMoved) return;
+    e.stopPropagation();
+
+    if (overlay.classList.contains('active')) {
+      // already expanded → just navigate to new focused tile
+      showCloneAtIndex(i); // this will move focus to new tile
+      return;
+    }
+
+    // not active yet → first expansion
+    showCloneAtIndex(i);
+  });
+});
+
+
+// --- overlay click closes all clones ---
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) hideExpandedClones();
+});
+
+window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') hideExpandedClones();
+});
+
+window.addEventListener('resize', recalc);
+</script>
+
+
+
+</body>
+</html>
